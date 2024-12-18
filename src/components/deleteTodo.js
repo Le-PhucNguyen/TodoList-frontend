@@ -8,15 +8,17 @@ const deleteTodos = async (ids) => {
 
     const responses = await Promise.all(deletePromises);
 
-    responses.forEach((response) => {
+    responses.forEach((response, index) => {
       if (!response.ok) {
-        throw new Error('Failed to delete one or more todos');
+        throw new Error(`Failed to delete todo with ID: ${ids[index]}`);
       }
     });
 
-    console.log('Successfully deleted selected todos');
+    console.log(
+      `Successfully soft deleted ${ids.length} todos with IDs: ${ids.join(', ')}`
+    );
   } catch (error) {
-    console.error('Error in deleteTodos:', error);
+    console.error('Error in deleteTodos:', error.message);
   }
 };
 

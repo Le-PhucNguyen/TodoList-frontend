@@ -8,7 +8,7 @@ const TodoApp = () => {
   const [filter, setFilter] = useState('all'); // all, completed, not_completed
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedTodos, setSelectedTodos] = useState([]); // New state for selected todos
+  const [selectedTodos, setSelectedTodos] = useState([]);
 
   // Fetch todos from the backend with search, filter, and pagination
   const fetchTodosData = useCallback(async () => {
@@ -20,7 +20,8 @@ const TodoApp = () => {
     }).toString();
 
     const data = await fetchTodos(queryParams);
-    setTodos(data.todos);
+    // Chỉ lấy các todo chưa bị soft delete
+    setTodos(data.todos.filter((todo) => !todo.isDeleted));
     setTotalPages(data.totalPages);
   }, [search, filter, page]);
 
@@ -46,21 +47,31 @@ const TodoApp = () => {
     }
   };
 
-  const handleDeleteTodo = async (id) => {
-    const deletedResponse = await deleteTodo(id);
+  const handleSoftDeleteTodo = async (id) => {
+    const deletedResponse = await deleteTodo(id, { softDelete: true });
     if (deletedResponse) {
-      setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo._id === id ? { ...todo, isDeleted: true } : todo
+        )
+      );
     }
   };
 
-  const handleDeleteSelectedTodos = async () => {
+  const handleSoftDeleteSelectedTodos = async () => {
     if (selectedTodos.length === 0) return;
-    const deletePromises = selectedTodos.map((id) => deleteTodo(id)); // Use deleteTodo for each selected todo
-    await Promise.all(deletePromises);
-    setTodos((prevTodos) =>
-      prevTodos.filter((todo) => !selectedTodos.includes(todo._id))
+
+    const deletePromises = selectedTodos.map((id) =>
+      deleteTodo(id, { softDelete: true })
     );
-    setSelectedTodos([]); // Clear selection after deleting
+    await Promise.all(deletePromises);
+
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        selectedTodos.includes(todo._id) ? { ...todo, isDeleted: true } : todo
+      )
+    );
+    setSelectedTodos([]);
   };
 
   const handleSelectTodo = (id) => {
@@ -73,12 +84,12 @@ const TodoApp = () => {
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setPage(1); // Reset to the first page
+    setPage(1);
   };
 
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
-    setPage(1); // Reset to the first page
+    setPage(1);
   };
 
   const handlePageChange = (newPage) => {
@@ -137,10 +148,10 @@ const TodoApp = () => {
       {/* Delete Selected Button */}
       <div>
         <button
-          onClick={handleDeleteSelectedTodos}
+          onClick={handleSoftDeleteSelectedTodos}
           disabled={selectedTodos.length === 0}
         >
-          Delete Selected
+          Soft Delete Selected
         </button>
       </div>
 
@@ -163,10 +174,10 @@ const TodoApp = () => {
               {todo.task}
             </span>
             <button
-              onClick={() => handleDeleteTodo(todo._id)}
+              onClick={() => handleSoftDeleteTodo(todo._id)}
               style={{ marginLeft: '10px' }}
             >
-              Delete
+              Soft Delete
             </button>
           </li>
         ))}
