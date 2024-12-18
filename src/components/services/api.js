@@ -1,42 +1,61 @@
+import axios from 'axios';
+
 const API_BASE_URL = '/api';
 
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return {
-    Authorization: `Bearer ${token}`,
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
     'Content-Type': 'application/json',
-  };
-};
+  },
+});
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export const fetchTodos = async (queryParams) => {
-  const response = await fetch(`${API_BASE_URL}/todos?${queryParams}`, {
-    headers: getAuthHeaders(),
-  });
-  return response.json();
+  try {
+    const response = await axiosInstance.get(`/todos?${queryParams}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching todos:', error);
+    throw error;
+  }
 };
 
 export const createTodo = async (task) => {
-  const response = await fetch(`${API_BASE_URL}/todos`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ task }),
-  });
-  return response.json();
+  try {
+    const response = await axiosInstance.post('/todos', { task });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating todo:', error);
+    throw error;
+  }
 };
 
 export const updateTodo = async (id, updates) => {
-  const response = await fetch(`${API_BASE_URL}/todos/${id}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(updates),
-  });
-  return response.json();
+  try {
+    const response = await axiosInstance.put(`/todos/${id}`, updates);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating todo:', error);
+    throw error;
+  }
 };
 
 export const deleteTodo = async (id) => {
-  const response = await fetch(`${API_BASE_URL}/todos/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  return response.json();
+  try {
+    const response = await axiosInstance.delete(`/todos/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting todo:', error);
+    throw error;
+  }
 };

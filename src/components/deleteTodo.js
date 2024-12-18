@@ -1,16 +1,23 @@
-const deleteTodo = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/todos/${id}`, {
+const deleteTodos = async (ids) => {
+  try {
+    const deletePromises = ids.map((id) =>
+      fetch(`http://localhost:5000/api/todos/${id}`, {
         method: 'DELETE',
-      });
+      })
+    );
+
+    const responses = await Promise.all(deletePromises);
+
+    responses.forEach((response) => {
       if (!response.ok) {
-        throw new Error('Failed to delete the to-do');
+        throw new Error('Failed to delete one or more todos');
       }
-      return await response.json();
-    } catch (error) {
-      console.error('Error in deleteTodo:', error);
-    }
-  };
-  
-  export default deleteTodo;
-  
+    });
+
+    console.log('Successfully deleted selected todos');
+  } catch (error) {
+    console.error('Error in deleteTodos:', error);
+  }
+};
+
+export default deleteTodos;

@@ -8,6 +8,7 @@ const TodoApp = () => {
   const [filter, setFilter] = useState('all'); // all, completed, not_completed
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedTodos, setSelectedTodos] = useState([]); // New state for selected todos
 
   // Fetch todos from the backend with search, filter, and pagination
   const fetchTodosData = useCallback(async () => {
@@ -50,6 +51,24 @@ const TodoApp = () => {
     if (deletedResponse) {
       setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
     }
+  };
+
+  const handleDeleteSelectedTodos = async () => {
+    if (selectedTodos.length === 0) return;
+    const deletePromises = selectedTodos.map((id) => deleteTodo(id)); // Use deleteTodo for each selected todo
+    await Promise.all(deletePromises);
+    setTodos((prevTodos) =>
+      prevTodos.filter((todo) => !selectedTodos.includes(todo._id))
+    );
+    setSelectedTodos([]); // Clear selection after deleting
+  };
+
+  const handleSelectTodo = (id) => {
+    setSelectedTodos((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((selectedId) => selectedId !== id)
+        : [...prevSelected, id]
+    );
   };
 
   const handleSearchChange = (e) => {
@@ -115,10 +134,25 @@ const TodoApp = () => {
         <button onClick={handleCreateTodo}>Add</button>
       </div>
 
+      {/* Delete Selected Button */}
+      <div>
+        <button
+          onClick={handleDeleteSelectedTodos}
+          disabled={selectedTodos.length === 0}
+        >
+          Delete Selected
+        </button>
+      </div>
+
       {/* Display todos */}
       <ul>
         {todos.map((todo) => (
           <li key={todo._id} style={{ display: 'flex', alignItems: 'center' }}>
+            <input
+              type="checkbox"
+              checked={selectedTodos.includes(todo._id)}
+              onChange={() => handleSelectTodo(todo._id)}
+            />
             <span
               style={{
                 textDecoration: todo.completed ? 'line-through' : 'none',
