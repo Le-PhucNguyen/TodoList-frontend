@@ -9,20 +9,29 @@ const TodoApp = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedTodos, setSelectedTodos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Fetch todos from the backend with search, filter, and pagination
   const fetchTodosData = useCallback(async () => {
-    const queryParams = new URLSearchParams({
-      search,
-      completed: filter === 'all' ? '' : filter === 'completed',
-      page,
-      limit: 10,
-    }).toString();
+    setLoading(true);
+    setError(null);
+    try {
+      const queryParams = new URLSearchParams({
+        search,
+        completed: filter === 'all' ? '' : filter === 'completed',
+        page,
+        limit: 10,
+      }).toString();
 
-    const data = await fetchTodos(queryParams);
-    // Chỉ lấy các todo chưa bị soft delete
-    setTodos(data.todos.filter((todo) => !todo.isDeleted));
-    setTotalPages(data.totalPages);
+      const data = await fetchTodos(queryParams);
+      setTodos(data.todos.filter((todo) => !todo.isDeleted));
+      setTotalPages(data.totalPages);
+    } catch (err) {
+      setError('Failed to fetch todos. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   }, [search, filter, page]);
 
   useEffect(() => {
@@ -31,47 +40,75 @@ const TodoApp = () => {
 
   const handleCreateTodo = async () => {
     if (!task.trim()) return;
-    const newTodo = await createTodo(task);
-    if (newTodo) {
-      setTodos((prevTodos) => [...prevTodos, newTodo]);
-      setTask('');
+    try {
+      setLoading(true);
+      const newTodo = await createTodo(task);
+      if (newTodo) {
+        setTodos((prevTodos) => [...prevTodos, newTodo]);
+        setTask('');
+      }
+    } catch (err) {
+      setError('Failed to create todo. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdateTodo = async (id, completed) => {
-    const updatedTodo = await updateTodo(id, { completed: !completed });
-    if (updatedTodo) {
-      setTodos((prevTodos) =>
-        prevTodos.map((todo) => (todo._id === id ? updatedTodo : todo))
-      );
+    try {
+      setLoading(true);
+      const updatedTodo = await updateTodo(id, { completed: !completed });
+      if (updatedTodo) {
+        setTodos((prevTodos) =>
+          prevTodos.map((todo) => (todo._id === id ? updatedTodo : todo))
+        );
+      }
+    } catch (err) {
+      setError('Failed to update todo. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSoftDeleteTodo = async (id) => {
-    const deletedResponse = await deleteTodo(id, { softDelete: true });
-    if (deletedResponse) {
-      setTodos((prevTodos) =>
-        prevTodos.map((todo) =>
-          todo._id === id ? { ...todo, isDeleted: true } : todo
-        )
-      );
+    try {
+      setLoading(true);
+      const deletedResponse = await deleteTodo(id, { softDelete: true });
+      if (deletedResponse) {
+        setTodos((prevTodos) =>
+          prevTodos.map((todo) =>
+            todo._id === id ? { ...todo, isDeleted: true } : todo
+          )
+        );
+      }
+    } catch (err) {
+      setError('Failed to delete todo. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSoftDeleteSelectedTodos = async () => {
     if (selectedTodos.length === 0) return;
 
-    const deletePromises = selectedTodos.map((id) =>
-      deleteTodo(id, { softDelete: true })
-    );
-    await Promise.all(deletePromises);
+    try {
+      setLoading(true);
+      const deletePromises = selectedTodos.map((id) =>
+        deleteTodo(id, { softDelete: true })
+      );
+      await Promise.all(deletePromises);
 
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        selectedTodos.includes(todo._id) ? { ...todo, isDeleted: true } : todo
-      )
-    );
-    setSelectedTodos([]);
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          selectedTodos.includes(todo._id) ? { ...todo, isDeleted: true } : todo
+        )
+      );
+      setSelectedTodos([]);
+    } catch (err) {
+      setError('Failed to delete selected todos. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSelectTodo = (id) => {
@@ -102,6 +139,12 @@ const TodoApp = () => {
     <div style={{ padding: '20px' }}>
       <h1>To-Do List</h1>
 
+      {/* Error Message */}
+      {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+
+      {/* Loading Indicator */}
+      {loading && <div>Loading...</div>}
+
       {/* Search Bar */}
       <div>
         <input
@@ -129,7 +172,10 @@ const TodoApp = () => {
         <span>
           Page {page} of {totalPages}
         </span>
-        <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          disabled={page === totalPages}
+        >
           Next
         </button>
       </div>
@@ -157,6 +203,7 @@ const TodoApp = () => {
 
       {/* Display todos */}
       <ul>
+        {todos.length === 0 && !loading && <li>No todos found.</li>}
         {todos.map((todo) => (
           <li key={todo._id} style={{ display: 'flex', alignItems: 'center' }}>
             <input
