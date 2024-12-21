@@ -19,13 +19,13 @@ const TodoApp = () => {
     try {
       const queryParams = new URLSearchParams({
         search,
-        completed: filter === 'all' ? '' : filter === 'completed',
+        completed: filter === 'completed' ? true : filter === 'not_completed' ? false : '',
         page,
         limit: 10,
       }).toString();
 
       const data = await fetchTodos(queryParams);
-      setTodos(data.todos.filter((todo) => !todo.isDeleted));
+      setTodos(data.todos.filter((todo) => !todo.isDeleted)); // Exclude soft-deleted todos
       setTotalPages(data.totalPages);
     } catch (err) {
       setError('Failed to fetch todos. Please try again later.');
@@ -42,11 +42,10 @@ const TodoApp = () => {
     if (!task.trim()) return;
     try {
       setLoading(true);
+      setError(null);
       const newTodo = await createTodo(task);
-      if (newTodo) {
-        setTodos((prevTodos) => [...prevTodos, newTodo]);
-        setTask('');
-      }
+      setTodos((prevTodos) => [...prevTodos, newTodo]);
+      setTask('');
     } catch (err) {
       setError('Failed to create todo. Please try again.');
     } finally {
@@ -57,12 +56,11 @@ const TodoApp = () => {
   const handleUpdateTodo = async (id, completed) => {
     try {
       setLoading(true);
+      setError(null);
       const updatedTodo = await updateTodo(id, { completed: !completed });
-      if (updatedTodo) {
-        setTodos((prevTodos) =>
-          prevTodos.map((todo) => (todo._id === id ? updatedTodo : todo))
-        );
-      }
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) => (todo._id === id ? updatedTodo : todo))
+      );
     } catch (err) {
       setError('Failed to update todo. Please try again.');
     } finally {
@@ -73,14 +71,13 @@ const TodoApp = () => {
   const handleSoftDeleteTodo = async (id) => {
     try {
       setLoading(true);
-      const deletedResponse = await deleteTodo(id, { softDelete: true });
-      if (deletedResponse) {
-        setTodos((prevTodos) =>
-          prevTodos.map((todo) =>
-            todo._id === id ? { ...todo, isDeleted: true } : todo
-          )
-        );
-      }
+      setError(null);
+      await deleteTodo(id, true); // Pass `true` for soft delete
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo._id === id ? { ...todo, isDeleted: true } : todo
+        )
+      );
     } catch (err) {
       setError('Failed to delete todo. Please try again.');
     } finally {
@@ -93,9 +90,9 @@ const TodoApp = () => {
 
     try {
       setLoading(true);
-      const deletePromises = selectedTodos.map((id) =>
-        deleteTodo(id, { softDelete: true })
-      );
+      setError(null);
+
+      const deletePromises = selectedTodos.map((id) => deleteTodo(id, true));
       await Promise.all(deletePromises);
 
       setTodos((prevTodos) =>
@@ -121,12 +118,12 @@ const TodoApp = () => {
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setPage(1);
+    setPage(1); // Reset to the first page when searching
   };
 
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
-    setPage(1);
+    setPage(1); // Reset to the first page when filtering
   };
 
   const handlePageChange = (newPage) => {
