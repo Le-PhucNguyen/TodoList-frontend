@@ -59,9 +59,14 @@ export const deleteTodo = async (id, softDelete = false) => {
     const response = await axiosInstance.delete(`/todos/${id}`, {
       params: { softDelete }, // Use query parameter for soft delete
     });
+
+    if (response.status === 404) {
+      console.error(`Todo with ID ${id} not found.`);
+    }
+
     return response.data;
   } catch (error) {
-    console.error('Error deleting todo:', error.response?.data || error.message);
+    console.error(`Error deleting todo with ID ${id}:`, error.response?.data || error.message);
     throw error;
   }
 };
@@ -69,10 +74,19 @@ export const deleteTodo = async (id, softDelete = false) => {
 // Delete multiple todos (supports soft delete via query parameter)
 export const deleteMultipleTodos = async (ids, softDelete = false) => {
   try {
+    if (!ids || ids.length === 0) {
+      throw new Error('No IDs provided for deletion.');
+    }
+
     const response = await axiosInstance.delete('/todos', {
       data: { ids },
       params: { softDelete }, // Use query parameter for soft delete
     });
+
+    if (response.status === 404) {
+      console.error(`One or more todos not found for IDs: ${ids.join(', ')}`);
+    }
+
     return response.data;
   } catch (error) {
     console.error('Error deleting multiple todos:', error.response?.data || error.message);
