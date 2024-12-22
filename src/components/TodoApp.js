@@ -12,13 +12,24 @@ const TodoApp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Debounced search state
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+
+  // Debounce logic for search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500); // 500ms debounce delay
+    return () => clearTimeout(handler);
+  }, [search]);
+
   // Fetch todos from the backend with search, filter, and pagination
   const fetchTodosData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const queryParams = new URLSearchParams({
-        search,
+        search: debouncedSearch,
         completed: filter === 'completed' ? true : filter === 'not_completed' ? false : '',
         page,
         limit: 10,
@@ -32,7 +43,7 @@ const TodoApp = () => {
     } finally {
       setLoading(false);
     }
-  }, [search, filter, page]);
+  }, [debouncedSearch, filter, page]);
 
   useEffect(() => {
     fetchTodosData();
