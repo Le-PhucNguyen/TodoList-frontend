@@ -36,7 +36,7 @@ const TodoApp = () => {
       }).toString();
 
       const data = await fetchTodos(queryParams);
-      setTodos(data.todos.filter((todo) => !todo.isDeleted)); // Exclude soft-deleted todos
+      setTodos(data.todos); // Todos already exclude soft-deleted in the backend
       setTotalPages(data.totalPages);
     } catch (err) {
       setError('Failed to fetch todos. Please try again later.');
@@ -84,11 +84,7 @@ const TodoApp = () => {
       setLoading(true);
       setError(null);
       await deleteTodo(id, true); // Pass `true` for soft delete
-      setTodos((prevTodos) =>
-        prevTodos.map((todo) =>
-          todo._id === id ? { ...todo, isDeleted: true } : todo
-        )
-      );
+      setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id)); // Remove deleted todo from list
     } catch (err) {
       setError('Failed to delete todo. Please try again.');
     } finally {
@@ -107,9 +103,7 @@ const TodoApp = () => {
       await Promise.all(deletePromises);
 
       setTodos((prevTodos) =>
-        prevTodos.map((todo) =>
-          selectedTodos.includes(todo._id) ? { ...todo, isDeleted: true } : todo
-        )
+        prevTodos.filter((todo) => !selectedTodos.includes(todo._id)) // Remove deleted todos from list
       );
       setSelectedTodos([]);
     } catch (err) {

@@ -1,32 +1,32 @@
-const deleteTodos = async (ids) => {
+const deleteTodos = async (ids, softDelete = true) => {
   try {
-    if (!ids || ids.length === 0) {
-      console.error('No IDs provided for deletion');
+    if (!Array.isArray(ids) || ids.length === 0) {
+      console.error('No valid IDs provided for deletion');
       return;
     }
 
     console.log('Starting deletion for IDs:', ids);
 
-    const deletePromises = ids.map((id) => {
-      console.log(`Sending DELETE request for ID: ${id}`);
-      return fetch(`http://localhost:5000/api/todos/${id}`, {
-        method: 'DELETE',
-      });
+    // Send a single request to handle multiple deletions
+    const response = await fetch(`http://localhost:5000/api/todos`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ids }), // Send IDs in the request body
+      params: { softDelete }, // Pass softDelete as a query parameter
     });
 
-    const responses = await Promise.all(deletePromises);
+    if (!response.ok) {
+      console.error(
+        `Failed to delete todos. Status: ${response.status}, Message: ${response.statusText}`
+      );
+      throw new Error('Failed to delete todos');
+    }
 
-    responses.forEach((response, index) => {
-      if (!response.ok) {
-        console.error(
-          `Failed to delete todo with ID: ${ids[index]}. Status: ${response.status}, Message: ${response.statusText}`
-        );
-        throw new Error(`Failed to delete todo with ID: ${ids[index]}`);
-      }
-    });
-
+    const result = await response.json();
     console.log(
-      `Successfully deleted ${ids.length} todos with IDs: ${ids.join(', ')}`
+      `Successfully deleted todos. Message: ${result.message}, Deleted Count: ${result.deletedCount || 'N/A'}`
     );
   } catch (error) {
     console.error('Error in deleteTodos:', error);
