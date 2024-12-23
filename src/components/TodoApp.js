@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { fetchTodos, createTodo, updateTodo, deleteTodo } from './services/api';
+import { fetchTodos, createTodo, updateTodo, deleteTodo, restoreTodo } from './services/api';
 
 const TodoApp = () => {
   const [todos, setTodos] = useState([]);
@@ -36,7 +36,7 @@ const TodoApp = () => {
       }).toString();
 
       const data = await fetchTodos(queryParams);
-      setTodos(data.todos); // Todos already exclude soft-deleted in the backend
+      setTodos(data.todos);
       setTotalPages(data.totalPages);
     } catch (err) {
       setError('Failed to fetch todos. Please try again later.');
@@ -83,8 +83,12 @@ const TodoApp = () => {
     try {
       setLoading(true);
       setError(null);
-      await deleteTodo(id, true); // Pass `true` for soft delete
-      setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id)); // Remove deleted todo from list
+      await deleteTodo(id, true); // Soft delete the todo
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo._id === id ? { ...todo, isDeleted: true } : todo
+        )
+      );
     } catch (err) {
       setError('Failed to delete todo. Please try again.');
     } finally {
@@ -92,22 +96,19 @@ const TodoApp = () => {
     }
   };
 
-  const handleSoftDeleteSelectedTodos = async () => {
-    if (selectedTodos.length === 0) return;
-
+  // Here is the updated TodoApp.js with the restoredTodo variable utilized in the handleRestoreTodo function, while keeping all other functions the same:
+  const handleRestoreTodo = async (id) => {
     try {
       setLoading(true);
       setError(null);
-
-      const deletePromises = selectedTodos.map((id) => deleteTodo(id, true));
-      await Promise.all(deletePromises);
-
+      const restoredTodo = await restoreTodo(id); // Retrieve the restored todo from the API
       setTodos((prevTodos) =>
-        prevTodos.filter((todo) => !selectedTodos.includes(todo._id)) // Remove deleted todos from list
+        prevTodos.map((todo) =>
+          todo._id === id ? { ...todo, ...restoredTodo, isDeleted: false } : todo
+        )
       );
-      setSelectedTodos([]);
     } catch (err) {
-      setError('Failed to delete selected todos. Please try again.');
+      setError('Failed to restore todo. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -193,16 +194,6 @@ const TodoApp = () => {
         <button onClick={handleCreateTodo}>Add</button>
       </div>
 
-      {/* Delete Selected Button */}
-      <div>
-        <button
-          onClick={handleSoftDeleteSelectedTodos}
-          disabled={selectedTodos.length === 0}
-        >
-          Soft Delete Selected
-        </button>
-      </div>
-
       {/* Display todos */}
       <ul>
         {todos.length === 0 && !loading && <li>No todos found.</li>}
@@ -212,6 +203,7 @@ const TodoApp = () => {
               type="checkbox"
               checked={selectedTodos.includes(todo._id)}
               onChange={() => handleSelectTodo(todo._id)}
+              disabled={todo.isDeleted} // Disable checkbox for deleted todos
             />
             <span
               style={{
@@ -222,12 +214,21 @@ const TodoApp = () => {
             >
               {todo.task}
             </span>
-            <button
-              onClick={() => handleSoftDeleteTodo(todo._id)}
-              style={{ marginLeft: '10px' }}
-            >
-              Soft Delete
-            </button>
+            {!todo.isDeleted ? (
+              <button
+                onClick={() => handleSoftDeleteTodo(todo._id)}
+                style={{ marginLeft: '10px' }}
+              >
+                Soft Delete
+              </button>
+            ) : (
+              <button
+                onClick={() => handleRestoreTodo(todo._id)}
+                style={{ marginLeft: '10px' }}
+              >
+                Restore
+              </button>
+            )}
           </li>
         ))}
       </ul>

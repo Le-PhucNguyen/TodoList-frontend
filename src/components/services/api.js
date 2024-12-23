@@ -99,3 +99,24 @@ export const deleteMultipleTodos = async (ids, softDelete = false) => {
     throw error;
   }
 };
+
+// Restore a soft-deleted todo
+export const restoreTodo = async (id) => {
+  try {
+    if (!id) {
+      throw new Error('Todo ID is required for restoration.');
+    }
+
+    const response = await axiosInstance.patch(`/todos/undo-delete/${id}`);
+
+    if (response.status === 404) {
+      console.error(`Todo with ID ${id} not found.`);
+      return { message: `Todo with ID ${id} not found.` };
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error(`Error restoring todo with ID ${id}:`, error.response?.data || error.message);
+    throw error;
+  }
+};
