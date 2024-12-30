@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar'; // Import the Navbar component
 import Login from './components/Login';
 import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -12,6 +13,8 @@ const App = () => {
   return (
     <AuthProvider>
       <Router>
+        {/* Navbar should appear above all routes */}
+        <Navbar />
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
