@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Axios instance configuration
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5000/api', // Ensure this matches your backend base URL
+  baseURL: 'http://localhost:5000/api', // Update to match your backend base URL
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,14 +11,27 @@ const axiosInstance = axios.create({
 // Add interceptor for attaching token to requests
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token'); // Ensure a valid token is stored
+    const token = localStorage.getItem('token'); // Retrieve token from localStorage
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`; // Attach token to Authorization header
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
+
+export default axiosInstance; // Default export for axiosInstance
+
+// Validate token
+export const validateToken = async (token) => {
+  try {
+    const response = await axiosInstance.post('/validate-token', { token });
+    return response.data; // Return user data and token validity
+  } catch (error) {
+    console.error('Error validating token:', error.response?.data || error.message);
+    throw error;
+  }
+};
 
 // Fetch todos with optional query parameters
 export const fetchTodos = async (queryParams = '') => {
@@ -61,7 +74,7 @@ export const deleteTodo = async (id, softDelete = false) => {
     }
 
     const response = await axiosInstance.delete(`/todos/${id}`, {
-      params: { softDelete }, // Use query parameter for soft delete
+      params: { softDelete }, // Soft delete query parameter
     });
 
     if (response.status === 404) {
@@ -85,7 +98,7 @@ export const deleteMultipleTodos = async (ids, softDelete = false) => {
 
     const response = await axiosInstance.delete('/todos', {
       data: { ids },
-      params: { softDelete }, // Use query parameter for soft delete
+      params: { softDelete }, // Soft delete query parameter
     });
 
     if (response.status === 404) {
@@ -99,6 +112,9 @@ export const deleteMultipleTodos = async (ids, softDelete = false) => {
     throw error;
   }
 };
+
+// New function: Delete todos (alias for deleteMultipleTodos for consistency with your code)
+export const deleteTodos = deleteMultipleTodos;
 
 // Restore a soft-deleted todo
 export const restoreTodo = async (id) => {
@@ -117,6 +133,27 @@ export const restoreTodo = async (id) => {
     return response.data;
   } catch (error) {
     console.error(`Error restoring todo with ID ${id}:`, error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Fetch a single todo by ID
+export const fetchTodoById = async (id) => {
+  try {
+    if (!id) {
+      throw new Error('Todo ID is required to fetch the todo.');
+    }
+
+    const response = await axiosInstance.get(`/todos/${id}`);
+
+    if (response.status === 404) {
+      console.error(`Todo with ID ${id} not found.`);
+      return { message: `Todo with ID ${id} not found.` };
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching todo with ID ${id}:`, error.response?.data || error.message);
     throw error;
   }
 };

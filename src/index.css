@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -55,5 +57,39 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .App {
+    @apply text-center;
+  }
+
+  .TodoWrapper {
+    @apply mt-20 p-8 rounded bg-dark;
+  }
+
+  .todo-input {
+    @apply outline-none border p-2 text-sm w-72 text-white bg-transparent;
+  }
+
+  .todo-btn {
+    @apply bg-primary text-white p-2 cursor-pointer;
+  }
+
+  .Todo {
+    @apply flex justify-between items-center p-3 rounded bg-primary text-white;
+  }
+
+  .completed {
+    @apply line-through text-gray-400 cursor-pointer;
+  }
+
+  .incompleted {
+    @apply text-white cursor-pointer;
+  }
+
+  .edit-icon, .delete-icon {
+    @apply cursor-pointer;
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { fetchTodos, createTodo, updateTodo, deleteTodo, restoreTodo } from './services/api';
+import { fetchTodos, createTodo, updateTodo, deleteTodo, restoreTodo, deleteTodos} from './services/api';
 
 const TodoApp = () => {
   const [todos, setTodos] = useState([]);
@@ -96,7 +96,6 @@ const TodoApp = () => {
     }
   };
 
-  // Here is the updated TodoApp.js with the restoredTodo variable utilized in the handleRestoreTodo function, while keeping all other functions the same:
   const handleRestoreTodo = async (id) => {
     try {
       setLoading(true);
@@ -137,6 +136,17 @@ const TodoApp = () => {
       setPage(newPage);
     }
   };
+
+  const handleDelete = async () => {
+    console.log("selectedTodos", selectedTodos)
+    try {
+      await deleteTodos(selectedTodos).then(() => {
+        fetchTodosData()
+      })
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   return (
     <div style={{ padding: '20px' }}>
@@ -219,7 +229,7 @@ const TodoApp = () => {
                 onClick={() => handleSoftDeleteTodo(todo._id)}
                 style={{ marginLeft: '10px' }}
               >
-                Soft Delete
+                Delete
               </button>
             ) : (
               <button
@@ -231,6 +241,12 @@ const TodoApp = () => {
             )}
           </li>
         ))}
+
+        {
+          selectedTodos && selectedTodos.length > 0 && <button onClick={() => handleDelete()} className='bg-red-500'>
+            Multiple Delete
+          </button>
+        }
       </ul>
     </div>
   );
