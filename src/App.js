@@ -5,6 +5,7 @@ import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import TodoApp from './components/TodoApp'; // Renamed your original App component to TodoApp
 import Profile from './components/Profile'; // Profile page for authenticated users
+import ForgotPassword from './components/ForgotPassword'; // Import the ForgotPassword component
 import { AuthProvider } from './context/AuthContext'; // AuthProvider for global auth state
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} /> {/* New Route */}
 
           {/* Protected Routes */}
           <Route
