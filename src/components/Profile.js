@@ -4,6 +4,7 @@ import axiosInstance from './services/api';
 
 const Profile = () => {
   const [profile, setProfile] = useState({ username: '', bio: '', avatar: '' });
+  const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -23,16 +24,28 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
-      const response = await axiosInstance.put('/auth/profile', {
-        bio: profile.bio,
-        avatar: profile.avatar,
+      const formData = new FormData();
+      formData.append('bio', profile.bio);
+      if (selectedFile) {
+        formData.append('avatar', selectedFile);
+      }
+
+      const response = await axiosInstance.put('/auth/profile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
+
       setProfile(response.data.user); // Update state with the latest profile data
     } catch (err) {
       console.error('Error updating profile:', err.response?.data || err.message);
@@ -70,13 +83,20 @@ const Profile = () => {
         </div>
         <div style={{ marginBottom: '10px' }}>
           <input
-            type="text"
-            placeholder="Avatar URL"
-            value={profile.avatar}
-            onChange={(e) => setProfile({ ...profile, avatar: e.target.value })}
+            type="file"
+            onChange={handleFileChange}
             style={{ width: '100%', padding: '8px' }}
           />
         </div>
+        {profile.avatar && (
+          <div style={{ marginBottom: '10px' }}>
+            <img
+              src={`http://localhost:5000/uploads/avatars/${profile.avatar}`}
+              alt="Avatar"
+              style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+            />
+          </div>
+        )}
         <button
           type="submit"
           disabled={isLoading}
