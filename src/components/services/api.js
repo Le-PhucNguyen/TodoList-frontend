@@ -33,6 +33,17 @@ export const validateToken = async (token) => {
   }
 };
 
+// Fetch user profile (new function to fetch profile with avatar)
+export const fetchUserProfile = async () => {
+  try {
+    const response = await axiosInstance.get('/auth/profile'); // Call the backend `/auth/profile` route
+    return response.data.user; // Return user profile data
+  } catch (error) {
+    console.error('Error fetching user profile:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 // Fetch todos with optional query parameters
 export const fetchTodos = async (queryParams = '') => {
   try {

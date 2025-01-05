@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from './services/api';
+import { fetchUserProfile } from './services/api'; // Import the new fetchUserProfile function
+import axiosInstance from './services/api'; // Import axiosInstance for updating profile
 
 const Profile = () => {
-  const [profile, setProfile] = useState({ username: '', bio: '', avatar: '' });
+  const [profile, setProfile] = useState({ username: '', bio: '', avatar: '' }); // Default values for profile state
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -13,8 +14,12 @@ const Profile = () => {
     // Fetch profile data when the component mounts
     const fetchProfile = async () => {
       try {
-        const response = await axiosInstance.get('/auth/profile');
-        setProfile(response.data.user);
+        const userData = await fetchUserProfile(); // Use the new fetchUserProfile function
+        setProfile({
+          username: userData.username || '',
+          bio: userData.bio || '',
+          avatar: userData.avatar || '',
+        }); // Ensure all fields are initialized properly
       } catch (err) {
         console.error('Error fetching profile:', err.response?.data || err.message);
         setError('Failed to load profile.');
@@ -35,9 +40,9 @@ const Profile = () => {
 
     try {
       const formData = new FormData();
-      formData.append('bio', profile.bio);
+      formData.append('bio', profile.bio); // Update the bio field
       if (selectedFile) {
-        formData.append('avatar', selectedFile);
+        formData.append('avatar', selectedFile); // Attach the selected avatar file
       }
 
       const response = await axiosInstance.put('/auth/profile', formData, {
@@ -46,7 +51,10 @@ const Profile = () => {
         },
       });
 
-      setProfile(response.data.user); // Update state with the latest profile data
+      setProfile({
+        ...profile,
+        ...response.data.user,
+      }); // Update the profile data in state
     } catch (err) {
       console.error('Error updating profile:', err.response?.data || err.message);
       setError('Failed to update profile.');
@@ -56,8 +64,8 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove token from storage
-    navigate('/login'); // Redirect to login
+    localStorage.removeItem('token'); // Remove the token from localStorage
+    navigate('/login'); // Redirect the user to the login page
   };
 
   return (
@@ -68,7 +76,7 @@ const Profile = () => {
         <div style={{ marginBottom: '10px' }}>
           <input
             type="text"
-            value={profile.username}
+            value={profile.username || ''} // Prevent uncontrolled-to-controlled warning
             disabled
             style={{ width: '100%', padding: '8px', backgroundColor: '#f0f0f0' }}
           />
@@ -76,7 +84,7 @@ const Profile = () => {
         <div style={{ marginBottom: '10px' }}>
           <textarea
             placeholder="Bio"
-            value={profile.bio}
+            value={profile.bio || ''} // Prevent uncontrolled-to-controlled warning
             onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
             style={{ width: '100%', padding: '8px' }}
           />

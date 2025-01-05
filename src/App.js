@@ -4,22 +4,22 @@ import Navbar from './components/Navbar'; // Import the Navbar component
 import Login from './components/Login';
 import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
-import TodoApp from './components/TodoApp'; // Renamed your original App component to TodoApp
+import TodoApp from './components/TodoApp'; // Main Todo application
 import Profile from './components/Profile'; // Profile page for authenticated users
-import ForgotPassword from './components/ForgotPassword'; // Import the ForgotPassword component
-import { AuthProvider } from './context/AuthContext'; // AuthProvider for global auth state
+import ForgotPassword from './components/ForgotPassword'; // Forgot Password page
+import { AuthProvider } from './context/AuthContext'; // AuthProvider for managing authentication state
 
 const App = () => {
   return (
     <AuthProvider>
       <Router>
-        {/* Navbar should appear above all routes */}
+        {/* Navbar is shown across all pages */}
         <Navbar />
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} /> {/* New Route */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Protected Routes */}
           <Route

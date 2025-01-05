@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // Added email field
   const [password, setPassword] = useState('');
-  const [profile, setProfile] = useState({ bio: '', avatar: '' }); // Added profile fields
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -18,15 +18,14 @@ const Register = () => {
       const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, profile }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       const data = await response.json();
       if (response.ok) {
         navigate('/login'); // Redirect to the login page
       } else {
-        // Show error message from the server or a generic message
-        setError(data.message || 'Registration failed');
+        setError(data.message || 'Registration failed'); // Show error message from server or a generic one
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
@@ -52,28 +51,21 @@ const Register = () => {
         </div>
         <div style={{ marginBottom: '10px' }}>
           <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             style={{ width: '100%', padding: '8px' }}
           />
         </div>
         <div style={{ marginBottom: '10px' }}>
-          <textarea
-            placeholder="Bio"
-            value={profile.bio}
-            onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-            style={{ width: '100%', padding: '8px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
           <input
-            type="text"
-            placeholder="Avatar URL"
-            value={profile.avatar}
-            onChange={(e) => setProfile({ ...profile, avatar: e.target.value })}
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
             style={{ width: '100%', padding: '8px' }}
           />
         </div>
