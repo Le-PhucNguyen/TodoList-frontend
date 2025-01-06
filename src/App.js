@@ -13,8 +13,9 @@ const App = () => {
   return (
     <AuthProvider>
       <Router>
-        {/* Navbar is shown across all pages */}
+        {/* Conditionally render Navbar only when the user is logged in */}
         <Navbar />
+
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
