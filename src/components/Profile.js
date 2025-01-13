@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchUserProfile } from './services/api'; // Import the new fetchUserProfile function
-import axiosInstance from './services/api'; // Import axiosInstance for updating profile
+import { AuthContext } from '../context/AuthContext';
+import axiosInstance from './services/api';
 
 const Profile = () => {
-  const [profile, setProfile] = useState({ username: '', bio: '', avatar: '' }); // Default values for profile state
+  const [profile, setProfile] = useState({ username: '', bio: '', avatar: '' });
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -14,26 +14,19 @@ const Profile = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [passwordChangeError, setPasswordChangeError] = useState('');
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('');
+  const { user, loading, refreshProfile } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // Fetch profile data only when user is available and loading is complete
   useEffect(() => {
-    // Fetch profile data when the component mounts
-    const fetchProfile = async () => {
-      try {
-        const userData = await fetchUserProfile(); // Use the new fetchUserProfile function
-        setProfile({
-          username: userData.username || '',
-          bio: userData.profile?.bio || '', // Ensure proper access to bio field
-          avatar: userData.profile?.avatar || '', // Ensure proper access to avatar field
-        }); // Ensure all fields are initialized properly
-      } catch (err) {
-        console.error('Error fetching profile:', err.response?.data || err.message);
-        setError('Failed to load profile.');
-      }
-    };
-
-    fetchProfile();
-  }, []);
+    if (!loading && user) {
+      setProfile({
+        username: user.username,
+        bio: user.profile?.bio || '',
+        avatar: user.profile?.avatar || '',
+      });
+    }
+  }, [loading, user]);
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -63,6 +56,7 @@ const Profile = () => {
         ...response.data.user,
       }); // Update the profile data in state
       setSuccessMessage('Profile updated successfully!');
+      await refreshProfile(); // Fetch the latest user data from context
     } catch (err) {
       console.error('Error updating profile:', err.response?.data || err.message);
       setError('Failed to update profile.');
@@ -103,20 +97,29 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove the token from localStorage
-    navigate('/login'); // Redirect the user to the login page
+    localStorage.removeItem('token');
+    navigate('/login');
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Render loading message when fetching user data
+  }
+
+  if (!user) {
+    return <div>Please log in to view your profile.</div>; // Show message if user is not logged in
+  }
 
   return (
     <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}>
       <h2>Profile</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+
       <form onSubmit={handleUpdateProfile}>
         <div style={{ marginBottom: '10px' }}>
           <input
             type="text"
-            value={profile.username || ''} // Prevent uncontrolled-to-controlled warning
+            value={profile.username || ''}
             disabled
             style={{ width: '100%', padding: '8px', backgroundColor: '#f0f0f0' }}
           />
@@ -124,7 +127,7 @@ const Profile = () => {
         <div style={{ marginBottom: '10px' }}>
           <textarea
             placeholder="Bio"
-            value={profile.bio || ''} // Prevent uncontrolled-to-controlled warning
+            value={profile.bio || ''}
             onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
             style={{ width: '100%', padding: '8px' }}
           />

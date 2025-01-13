@@ -1,91 +1,95 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
-* {
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 body {
-  background: #8758ff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @apply bg-gradient-to-br from-purple-600 to-purple-900 flex justify-center items-start min-h-screen pt-4;
 }
 
 .App {
-  text-align: center;
+  @apply w-full max-w-2xl px-4 text-center mt-4;
 }
 
-h1 {
-  color: #fff;
-  margin-bottom: 0.5rem;
-  font-size: 1.75rem;
+/* Navbar */
+.navbar {
+  @apply flex justify-between items-center bg-white py-3 px-6 shadow-md rounded-lg mb-4;
 }
 
+/* Main Container */
 .TodoWrapper {
-  background: #1A1A40;
-  margin-top: 5rem;
-  padding: 2rem;
-  border-radius: 5px;
+  @apply bg-white rounded-lg shadow-lg p-6 mx-auto w-full mt-2;
 }
 
-.TodoForm {
-  width: 100%;
-  margin-bottom: 1rem;
+/* Search Bar */
+.todo-search {
+  @apply w-full p-2 rounded-md border border-light-purple focus:outline-none focus:ring-2 focus:ring-primary-purple;
 }
 
+/* Input Field */
 .todo-input {
-  outline: none;
-  background: none;
-  border: 1px solid #8758ff;
-  padding: 0.5rem 1rem;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-  width: 300px;
-  color: #fff;
+  @apply w-full px-4 py-2 bg-light-purple text-white rounded-md border border-purple-400 placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-primary-purple;
 }
 
-.todo-input::placeholder {
-  color: #ffffff4d;
+/* Add Button */
+.todo-add {
+  @apply ml-2 px-4 py-2 text-white bg-purple-600 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-primary-purple;
 }
 
-.todo-btn {
-  background: #8758ff;
-  color: #fff;
-  border: none;
-  padding: 0.55rem;
-  cursor: pointer;
+/* Task Item */
+.todo-item {
+  @apply flex justify-between items-center p-3 bg-light-purple text-white rounded-md mb-2;
 }
 
-.Todo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #8758ff;
-  color: #fff;
-  padding: 0.75rem 1rem;
-  border-radius: 5px;
-  margin-bottom: 1rem;
+/* Delete Button */
+.todo-delete {
+  @apply px-2 py-1 text-white bg-red-500 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400;
 }
 
-.fa-trash {
-  margin-left: 0.75rem;
+/* Pagination */
+.pagination {
+  @apply flex justify-between items-center text-white mt-4;
 }
 
-.incompleted {
-  color: #fff;
-  cursor: pointer;
+/* Profile Form */
+.profile-form input,
+.profile-form textarea {
+  @apply w-full p-3 bg-white text-dark-purple rounded-md border border-light-purple mb-4 focus:outline-none focus:ring-2 focus:ring-primary-purple;
 }
 
-.completed {
-  color: #c5aeff;
-  text-decoration: line-through;
-  cursor: pointer;
+/* Login Page */
+.login-page {
+  @apply flex flex-col justify-center items-center min-h-screen bg-gradient-to-b from-purple-700 to-purple-900 text-white px-4;
 }
 
-.edit-icon,
-.delete-icon {
-  cursor: pointer;
+.login-box {
+  @apply bg-white text-dark-purple rounded-lg shadow-lg p-6 max-w-md w-full;
+}
+
+.login-box h1 {
+  @apply text-2xl font-bold text-center mb-4;
+}
+
+.login-box label {
+  @apply block text-sm font-medium mb-2;
+}
+
+.login-box input {
+  @apply w-full p-3 mb-4 bg-light-purple text-white rounded-md border border-purple-400 placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-primary-purple;
+}
+
+.login-box button {
+  @apply w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-primary-purple;
+}
+
+.login-box a {
+  @apply text-purple-500 hover:underline mt-4 inline-block text-sm;
+}
+
+/* Extra Styling for Links */
+.login-box a.register-link {
+  @apply font-medium text-purple-400 hover:text-purple-500;
+}
+
+.login-box a.forgot-password {
+  @apply text-sm text-gray-500 hover:text-gray-400;
 }

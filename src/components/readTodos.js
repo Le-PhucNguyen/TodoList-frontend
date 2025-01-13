@@ -12,4 +12,3 @@ const readTodos = async (queryParams = '') => {
 };
 
 export default readTodos;
-

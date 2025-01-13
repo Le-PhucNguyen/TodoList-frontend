@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   const refreshProfile = async () => {
     try {
       const response = await axiosInstance.get('/auth/profile');
-      setUser(response.data.user);
+      setUser(response.data.user); // Update the user in the context
     } catch (error) {
       console.error('Error refreshing user profile:', error);
       logout(); // Clear token if refreshing fails

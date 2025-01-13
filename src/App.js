@@ -8,6 +8,7 @@ import TodoApp from './components/TodoApp'; // Main Todo application
 import Profile from './components/Profile'; // Profile page for authenticated users
 import ForgotPassword from './components/ForgotPassword'; // Forgot Password page
 import { AuthProvider } from './context/AuthContext'; // AuthProvider for managing authentication state
+import "./App.css";
 
 const App = () => {
   return (
