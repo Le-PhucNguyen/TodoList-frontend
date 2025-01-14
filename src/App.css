@@ -2,12 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Body */
 body {
-  @apply bg-gradient-to-br from-purple-600 to-purple-900 flex justify-center items-start min-h-screen pt-4;
+  @apply bg-gradient-to-br from-purple-600 to-purple-900 flex justify-center items-center min-h-screen;
 }
 
+/* App Wrapper */
 .App {
-  @apply w-full max-w-2xl px-4 text-center mt-4;
+  @apply w-full max-w-4xl mx-auto p-4;
 }
 
 /* Navbar */
@@ -15,81 +17,87 @@ body {
   @apply flex justify-between items-center bg-white py-3 px-6 shadow-md rounded-lg mb-4;
 }
 
-/* Main Container */
-.TodoWrapper {
-  @apply bg-white rounded-lg shadow-lg p-6 mx-auto w-full mt-2;
+/* Todo Header */
+.todo-header {
+  @apply text-3xl font-bold text-white mb-6 text-center;
+}
+
+/* Error Message */
+.error-message {
+  @apply text-red-500 mb-4 text-center font-medium;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  @apply text-white text-lg mb-4 text-center;
 }
 
 /* Search Bar */
+.todo-search-wrapper {
+  @apply flex justify-between mb-4 gap-2;
+}
+
 .todo-search {
-  @apply w-full p-2 rounded-md border border-light-purple focus:outline-none focus:ring-2 focus:ring-primary-purple;
+  @apply w-full p-3 rounded-md border border-light-purple focus:outline-none focus:ring-2 focus:ring-primary-purple;
 }
 
-/* Input Field */
-.todo-input {
-  @apply w-full px-4 py-2 bg-light-purple text-white rounded-md border border-purple-400 placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-primary-purple;
-}
-
-/* Add Button */
-.todo-add {
-  @apply ml-2 px-4 py-2 text-white bg-purple-600 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-primary-purple;
-}
-
-/* Task Item */
-.todo-item {
-  @apply flex justify-between items-center p-3 bg-light-purple text-white rounded-md mb-2;
-}
-
-/* Delete Button */
-.todo-delete {
-  @apply px-2 py-1 text-white bg-red-500 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400;
+/* Filter Dropdown */
+.todo-filter {
+  @apply w-40 p-3 rounded-md border border-light-purple bg-white text-dark-purple focus:outline-none focus:ring-2 focus:ring-primary-purple;
 }
 
 /* Pagination */
 .pagination {
-  @apply flex justify-between items-center text-white mt-4;
+  @apply flex justify-between items-center text-white mt-4 text-sm;
 }
 
-/* Profile Form */
-.profile-form input,
-.profile-form textarea {
-  @apply w-full p-3 bg-white text-dark-purple rounded-md border border-light-purple mb-4 focus:outline-none focus:ring-2 focus:ring-primary-purple;
+.pagination button {
+  @apply px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary-purple;
 }
 
-/* Login Page */
-.login-page {
-  @apply flex flex-col justify-center items-center min-h-screen bg-gradient-to-b from-purple-700 to-purple-900 text-white px-4;
+/* New Task Input */
+.new-task-wrapper {
+  @apply flex gap-2 items-center mb-6;
 }
 
-.login-box {
-  @apply bg-white text-dark-purple rounded-lg shadow-lg p-6 max-w-md w-full;
+.new-task-input {
+  @apply w-full p-3 bg-light-purple text-white rounded-md border border-purple-400 placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-primary-purple;
 }
 
-.login-box h1 {
-  @apply text-2xl font-bold text-center mb-4;
+.new-task-button {
+  @apply px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-primary-purple;
 }
 
-.login-box label {
-  @apply block text-sm font-medium mb-2;
+/* Todo List */
+.todo-list {
+  @apply bg-white rounded-lg shadow-lg p-6 w-full;
 }
 
-.login-box input {
-  @apply w-full p-3 mb-4 bg-light-purple text-white rounded-md border border-purple-400 placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-primary-purple;
+.todo-item {
+  @apply flex justify-between items-center p-3 bg-light-purple text-white rounded-md mb-2;
 }
 
-.login-box button {
-  @apply w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-primary-purple;
+.todo-item span {
+  @apply flex-1 cursor-pointer;
 }
 
-.login-box a {
-  @apply text-purple-500 hover:underline mt-4 inline-block text-sm;
+.todo-item.completed span {
+  @apply line-through text-purple-300;
 }
 
-/* Extra Styling for Links */
-.login-box a.register-link {
-  @apply font-medium text-purple-400 hover:text-purple-500;
+.todo-item button {
+  @apply px-2 py-1 text-white rounded-md focus:outline-none focus:ring-2;
 }
 
-.login-box a.forgot-password {
-  @apply text-sm text-gray-500 hover:text-gray-400;
+.todo-delete {
+  @apply bg-red-500 hover:bg-red-600 focus:ring-red-400;
+}
+
+.todo-restore {
+  @apply bg-green-500 hover:bg-green-600 focus:ring-green-400;
+}
+
+/* Multi-Delete Button */
+.multi-delete-button {
+  @apply px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 mt-4;
 }

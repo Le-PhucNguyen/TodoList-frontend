@@ -43,41 +43,57 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleLogin}>
-        <div>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            disabled={isLoading} // Disable input during loading
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={isLoading} // Disable input during loading
-          />
-        </div>
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+    <div className="login-page">
+      <div className="login-box">
+        <h1>Login</h1>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label htmlFor="username" className="block text-purple-700">Username</label>
+            <input
+              id="username"
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-3 bg-purple-100 text-purple-800 rounded-md border border-purple-300 placeholder-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              required
+              disabled={isLoading}
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-purple-700">Password</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 bg-purple-100 text-purple-800 rounded-md border border-purple-300 placeholder-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              required
+              disabled={isLoading}
+            />
+          </div>
+          <button
+            type="submit"
+            className={`w-full py-3 rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-500 shadow-md ${isLoading && 'opacity-50 cursor-not-allowed'}`}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
 
-      <p>
-        Don't have an account? <a href="/register">Register here</a>
-      </p>
-      <p>
-        Forgot your password? <a href="/forgot-password">Reset it here</a>
-      </p>
+        <div className="mt-4 space-y-2">
+          <p>
+            Don't have an account?{' '}
+            <a href="/register" className="register-link">Register here</a>
+          </p>
+          <p>
+            Forgot your password?{' '}
+            <a href="/forgot-password" className="forgot-password">Reset it here</a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

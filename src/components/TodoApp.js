@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { fetchTodos, createTodo, updateTodo, deleteTodo, restoreTodo, deleteTodos} from './services/api';
+import {
+  fetchTodos,
+  createTodo,
+  updateTodo,
+  deleteTodo,
+  restoreTodo,
+  deleteTodos,
+} from './services/api';
 
 const TodoApp = () => {
   const [todos, setTodos] = useState([]);
@@ -30,7 +37,8 @@ const TodoApp = () => {
     try {
       const queryParams = new URLSearchParams({
         search: debouncedSearch,
-        completed: filter === 'completed' ? true : filter === 'not_completed' ? false : '',
+        completed:
+          filter === 'completed' ? true : filter === 'not_completed' ? false : '',
         page,
         limit: 10,
       }).toString();
@@ -138,39 +146,38 @@ const TodoApp = () => {
   };
 
   const handleDelete = async () => {
-    console.log("selectedTodos", selectedTodos)
     try {
-      await deleteTodos(selectedTodos).then(() => {
-        fetchTodosData()
-      })
+      await deleteTodos(selectedTodos);
+      fetchTodosData();
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }
+  };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>To-Do List</h1>
+    <div className="App">
+      <h1 className="todo-header">To-Do List</h1>
 
       {/* Error Message */}
-      {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+      {error && <div className="error-message">{error}</div>}
 
       {/* Loading Indicator */}
-      {loading && <div>Loading...</div>}
+      {loading && <div className="loading-spinner">Loading...</div>}
 
       {/* Search Bar */}
-      <div>
+      <div className="todo-search-wrapper">
         <input
+          className="todo-search"
           type="text"
           value={search}
           onChange={handleSearchChange}
           placeholder="Search todos"
         />
-      </div>
-
-      {/* Filter Dropdown */}
-      <div>
-        <select value={filter} onChange={handleFilterChange}>
+        <select
+          className="todo-filter"
+          value={filter}
+          onChange={handleFilterChange}
+        >
           <option value="all">All</option>
           <option value="completed">Completed</option>
           <option value="not_completed">Not Completed</option>
@@ -178,8 +185,11 @@ const TodoApp = () => {
       </div>
 
       {/* Pagination Controls */}
-      <div>
-        <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
+      <div className="pagination">
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page === 1}
+        >
           Previous
         </button>
         <span>
@@ -194,21 +204,27 @@ const TodoApp = () => {
       </div>
 
       {/* Input for new todo */}
-      <div>
+      <div className="new-task-wrapper">
         <input
+          className="new-task-input"
           type="text"
           value={task}
           onChange={(e) => setTask(e.target.value)}
           placeholder="Enter a new task"
         />
-        <button onClick={handleCreateTodo}>Add</button>
+        <button className="new-task-button" onClick={handleCreateTodo}>
+          Add
+        </button>
       </div>
 
       {/* Display todos */}
-      <ul>
-        {todos.length === 0 && !loading && <li>No todos found.</li>}
+      <div className="todo-list">
+        {todos.length === 0 && !loading && <div>No todos found.</div>}
         {todos.map((todo) => (
-          <li key={todo._id} style={{ display: 'flex', alignItems: 'center' }}>
+          <div
+            key={todo._id}
+            className={`todo-item ${todo.completed ? 'completed' : ''}`}
+          >
             <input
               type="checkbox"
               checked={selectedTodos.includes(todo._id)}
@@ -216,38 +232,37 @@ const TodoApp = () => {
               disabled={todo.isDeleted} // Disable checkbox for deleted todos
             />
             <span
-              style={{
-                textDecoration: todo.completed ? 'line-through' : 'none',
-                cursor: 'pointer',
-              }}
               onClick={() => handleUpdateTodo(todo._id, todo.completed)}
             >
               {todo.task}
             </span>
             {!todo.isDeleted ? (
               <button
+                className="todo-delete"
                 onClick={() => handleSoftDeleteTodo(todo._id)}
-                style={{ marginLeft: '10px' }}
               >
                 Delete
               </button>
             ) : (
               <button
+                className="todo-restore"
                 onClick={() => handleRestoreTodo(todo._id)}
-                style={{ marginLeft: '10px' }}
               >
                 Restore
               </button>
             )}
-          </li>
+          </div>
         ))}
 
-        {
-          selectedTodos && selectedTodos.length > 0 && <button onClick={() => handleDelete()} className='bg-red-500'>
+        {selectedTodos.length > 0 && (
+          <button
+            onClick={handleDelete}
+            className="multi-delete-button"
+          >
             Multiple Delete
           </button>
-        }
-      </ul>
+        )}
+      </div>
     </div>
   );
 };
